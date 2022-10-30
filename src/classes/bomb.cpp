@@ -120,16 +120,16 @@ public:
     {
         currentTimerMinutes = timerMinutes;
         currentTimerSeconds = timerSeconds;
+        
+        clearLine(lcd, 1);
+        lcd.print(timerMinutes);
 
-        while (currentTimerSeconds != 0)
+        while (currentTimerMinutes > 0 && currentTimerSeconds > 0)
         {
             decreaseCurrentTimerBySecond();
             refreshBombTimer(lcd);
             delay(1000);
         }
-
-        clearLine(lcd, 1);
-        lcd.print(timerMinutes);
     }
 
     void plantBomb(LiquidCrystal lcd)

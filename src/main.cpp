@@ -9,12 +9,24 @@
 #define key3 5 // connect wire 3 to pin 4
 #define key4 6 // connect wire 4 to pin 5
 
+#define debounce 20   // ms debounce period to prevent flickering when pressing or releasing the button
+#define holdTime 1000 // ms hold period: how long to wait for press+hold event
+
+// Button variables for press and hold function
+// int buttonVal = LOW;      // value read from button
+int button2SLast = HIGH;  // buffered value of the button's previous state
+long btn2SDnTime;         // time the button was pressed down
+long btn2SUpTime;         // time the button was released
+boolean ignoreUp = false; // whether to ignore the button release because the click+hold was triggered
+
 LiquidCrystal lcd(12, 13, 8, 9, 10, 11); /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
 
 Bomb bomb;
 Game game;
 
-// void clearLine(int line);
+int timeBombPlanted;
+int timeBombStaredDefusing;
+int lap = 0;
 
 void setup()
 {
@@ -36,11 +48,10 @@ void loop()
   int key1S = digitalRead(key1);
   int key2S = digitalRead(key2);
   int key3S = digitalRead(key3);
- int key4S = digitalRead(key4);
+  int key4S = digitalRead(key4);
 
   /*
-    In menu: changes game mode
-    In any game mode: goes back to menu
+   Defines what button one does in different game states when pressed
   */
   if (!key1S)
   {
@@ -49,77 +60,224 @@ void loop()
       game.switchGameMode();
       game.displayGameMenu(lcd);
     }
-    else if (game.currentState != IN_MENU)
+
+    else if (game.currentState == IN_BOMB_MODE)
     {
-      if (game.currentMode == BOMB)
+      if (game.currentState == BOMB_PLANTED)
       {
-        game.bomb.reset();
-      }
-      else if (game.currentMode == DOMINATOR)
-      {
-        // not implemented yet
-        // dominator.reset();
+        /* code */
       }
 
-      game.currentState = IN_MENU;
-      game.displayGameMenu(lcd);
+      if (game.currentState == BOMB_EXPLODED)
+      {
+        /* code */
+      }
+    }
+
+    else if (game.currentState == IN_DOMINATOR_MODE)
+    {
+      if (game.currentState == DOMINATOR_RED)
+      {
+        /* code */
+      }
+
+      if (game.currentState == DOMINATOR_BLUE)
+      {
+        /* code */
+      }
+
+      if (game.currentState == DOMINATOR_NEUTRAL)
+      {
+        /* code */
+      }
+    }
+
+    delay(200);
+  }
+
+  // Source for press and hold: http://jmsarduino.blogspot.com/2009/05/click-for-press-and-hold-for-b.html
+
+  /*
+   Defines what button two does in different game states when pressed
+  */
+  // Test for button pressed and store the down time
+  if (key2S == LOW && button2SLast == HIGH && (millis() - btn2SUpTime) > long(debounce))
+  {
+    btn2SDnTime = millis();
+
+    // if we are in bomb mode, this will mark time of planting sequence start
+    // later we will compare this time with actual time of program and udpate progress bar
+    if (game.currentState == IN_BOMB_MODE)
+    {
+      timeBombPlanted = millis();
+    }
+  }
+
+  // Test for button release and store the up time
+  // Basically if button is pressed
+  if (key2S == HIGH && button2SLast == LOW && (millis() - btn2SDnTime) > long(debounce))
+  {
+    // button is pressed
+    if (ignoreUp == false)
+    {
+      if (game.currentState == IN_MENU)
+      {
+        // What to do if button 2 is pressed in menu
+        if (game.currentMode == BOMB)
+        {
+          game.currentState = IN_BOMB_MODE;
+          game.displayBombMode(lcd);
+        }
+      }
+
+      else if (game.currentState == IN_BOMB_MODE)
+      {
+        // What to do if button 2 is pressed in bomb mode
+      }
+
+      else if (game.currentState == IN_DOMINATOR_MODE)
+      {
+        // What to do if button 2 is pressed in dominator mode
+      }
+
+      delay(200);
+    }
+    // button is held
+    else
+    {
+      ignoreUp = false;
+      btn2SUpTime = millis();
+    }
+  }
+
+  // Test for button held down for longer than the hold time
+  // Basically if button is held more than hold time
+  if (key2S == LOW && (millis() - btn2SDnTime) > long(holdTime))
+  {
+    if (game.currentState == IN_MENU)
+    {
+      // What to do if button 2 is held in menu
+    }
+
+    else if (game.currentState == IN_BOMB_MODE)
+    {
+      // What to do if button 2 is held in bomb mode
+      while (key2S == LOW && (millis() - btn2SDnTime) > long(holdTime))
+      {       
+        game.currentState = BOMB_PLANTED;
+        game.bomb.plantBomb(lcd);
+        game.bomb.startTimer(lcd);
+      }
+      game.bomb.clearLine(lcd, 1);
+      lcd.print("Bomb planted!   ");
+    }
+
+    else if (game.currentState == IN_DOMINATOR_MODE)
+    {
+      // What to do if button 2 is held in dominator mode
+    }
+
+    ignoreUp = true;
+    btn2SDnTime = millis();
+  }
+
+  /*
+   Defines what button three does in different game states when pressed
+  */
+  if (!key3S)
+  {
+    if (game.currentState == IN_MENU)
+    {
+      /* This button  does nothing when in menu*/
+    }
+
+    else if (game.currentState == IN_BOMB_MODE)
+    {
+      if (game.currentState == BOMB_PLANTED)
+      {
+        /* This button  does nothing when bomb is planted*/
+      }
+
+      if (game.currentState == BOMB_EXPLODED)
+      {
+        /* This button  does nothing when bomb is planted*/
+      }
+      else
+      {
+        game.bomb.decreaseTimerByStep();
+        game.displayBombMode(lcd);
+      }
+    }
+
+    else if (game.currentState == IN_DOMINATOR_MODE)
+    {
+      if (game.currentState == DOMINATOR_RED)
+      {
+        /* code */
+      }
+
+      if (game.currentState == DOMINATOR_BLUE)
+      {
+        /* code */
+      }
+
+      if (game.currentState == DOMINATOR_NEUTRAL)
+      {
+        /* code */
+      }
     }
 
     delay(200);
   }
 
   /*
-    In menu: Chooses game mode and enter it's menu
-    In game mode:
-        - BOMB:
-            - Not Planted: will plant bomb (hold)
-            - Planted: will defuse bomb (hold)
+   Defines what button four does in different game states when pressed
   */
-  if (!key2S)
+  if (!key4S)
   {
     if (game.currentState == IN_MENU)
     {
-      if (game.currentMode == BOMB)
-      {
-        game.currentState = IN_BOMB_MODE;
-        game.displayBombMode(lcd);
-      }
+      /* This button  does nothing when in menu*/
     }
+
     else if (game.currentState == IN_BOMB_MODE)
     {
-      game.currentState = BOMB_PLANTED;
-      game.bomb.plantBomb(lcd);
-      game.bomb.startTimer(lcd);
-    }
-
-    delay(500);
-  }
-
-  if (!key3S)
-  {
-
-    if (game.currentMode == BOMB)
-    {
-
-      if (game.currentState == IN_BOMB_MODE)
+      if (game.currentState == BOMB_PLANTED)
       {
-        game.bomb.decreaseTimerByStep();
-        game.displayBombMode(lcd);
-        delay(150);
+        /* This button  does nothing when bomb is planted*/
       }
-    }
-  }
 
-  if (!key4S)
-  {
-    if (game.currentMode == BOMB)
-    {
-      if (game.currentState == IN_BOMB_MODE)
+      if (game.currentState == BOMB_EXPLODED)
+      {
+        /* This button  does nothing when bomb is planted*/
+      }
+      else
       {
         game.bomb.increaseTimerByStep();
         game.displayBombMode(lcd);
-        delay(150);
       }
     }
+
+    else if (game.currentState == IN_DOMINATOR_MODE)
+    {
+      if (game.currentState == DOMINATOR_RED)
+      {
+        /* code */
+      }
+
+      if (game.currentState == DOMINATOR_BLUE)
+      {
+        /* code */
+      }
+
+      if (game.currentState == DOMINATOR_NEUTRAL)
+      {
+        /* code */
+      }
+    }
+
+    delay(200);
   }
+
+  button2SLast = key2S;
 }
