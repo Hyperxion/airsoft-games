@@ -102,7 +102,7 @@ public:
         lcd.print(buffer);
     }
 
-    void refreshBombTimer(LiquidCrystal lcd)
+    void refreshTimer(LiquidCrystal lcd)
     {
         char buffer[17];
         clearLine(lcd, 0);
@@ -127,7 +127,7 @@ public:
         while (currentTimerMinutes > 0 && currentTimerSeconds > 0)
         {
             decreaseCurrentTimerBySecond();
-            refreshBombTimer(lcd);
+            refreshTimer(lcd);
             delay(1000);
         }
     }

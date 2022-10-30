@@ -1,5 +1,6 @@
 #include <LiquidCrystal.h>
 #include "classes/bomb.cpp"
+#include "classes/dominator.cpp"
 
 enum GAME_STATES
 {
@@ -9,8 +10,7 @@ enum GAME_STATES
     BOMB_EXPLODED,
     IN_DOMINATOR_MODE,
     DOMINATOR_RED,
-    DOMINATOR_BLUE,
-    DOMINATOR_NEUTRAL
+    DOMINATOR_BLUE
 };
 
 enum GAME_MODES
@@ -23,12 +23,14 @@ class Game
 {
 public:
     Bomb bomb;
+    Dominator dominator;
     GAME_STATES currentState;
     GAME_MODES currentMode;
 
     Game()
     {
         bomb = Bomb();
+        dominator = Dominator();
         currentState = IN_MENU;
         currentMode = BOMB;
     }
@@ -68,5 +70,31 @@ public:
         bomb.displayTimer(lcd);
         lcd.setCursor(0, 1);
         lcd.print(">Plant Bomb");
+    }
+
+    void displayDominatorMode(LiquidCrystal lcd)
+    {
+        dominator.displayTimer(lcd);
+        //clearLine(lcd, 1);
+        lcd.setCursor(0, 1);
+        if (currentState == IN_DOMINATOR_MODE)
+        {
+            lcd.print("Red   >Ne   Blue");
+        }
+        else if (currentState == DOMINATOR_BLUE)
+        {
+            lcd.print("Red   Ne   >Blue");
+        }
+        else
+        {
+            lcd.print(">Red   Ne   Blue");
+        }
+    }
+
+    void clearLine(LiquidCrystal lcd, int line)
+    {
+        lcd.setCursor(0, line);
+        lcd.print("                ");
+        lcd.setCursor(0, line);
     }
 };

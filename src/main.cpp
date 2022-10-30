@@ -85,11 +85,6 @@ void loop()
       {
         /* code */
       }
-
-      if (game.currentState == DOMINATOR_NEUTRAL)
-      {
-        /* code */
-      }
     }
 
     delay(200);
@@ -128,6 +123,12 @@ void loop()
           game.currentState = IN_BOMB_MODE;
           game.displayBombMode(lcd);
         }
+
+        if (game.currentMode == DOMINATOR)
+        {
+          game.currentState = IN_DOMINATOR_MODE;
+          game.displayDominatorMode(lcd);
+        }
       }
 
       else if (game.currentState == IN_BOMB_MODE)
@@ -163,7 +164,7 @@ void loop()
     {
       // What to do if button 2 is held in bomb mode
       while (key2S == LOW && (millis() - btn2SDnTime) > long(holdTime))
-      {       
+      {
         game.currentState = BOMB_PLANTED;
         game.bomb.plantBomb(lcd);
         game.bomb.startTimer(lcd);
@@ -220,11 +221,6 @@ void loop()
       {
         /* code */
       }
-
-      if (game.currentState == DOMINATOR_NEUTRAL)
-      {
-        /* code */
-      }
     }
 
     delay(200);
@@ -269,14 +265,18 @@ void loop()
       {
         /* code */
       }
-
-      if (game.currentState == DOMINATOR_NEUTRAL)
-      {
-        /* code */
-      }
     }
 
     delay(200);
+  }
+
+  // Dominator time measuring
+  if (game.currentState == DOMINATOR_RED) {
+    delay(1000);
+    game.dominator.resumeRedTimer();
+  } else if (game.currentState == DOMINATOR_RED) {
+    delay(1000);
+    game.dominator.resumeRedTimer();
   }
 
   button2SLast = key2S;
