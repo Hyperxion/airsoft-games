@@ -120,7 +120,7 @@ public:
     {
         currentTimerMinutes = timerMinutes;
         currentTimerSeconds = timerSeconds;
-        
+
         clearLine(lcd, 1);
         lcd.print(timerMinutes);
 
@@ -159,6 +159,20 @@ public:
         delay(2000);
         clearLine(lcd, 1);
         lcd.print(">Defuse        ");
+    }
+
+    void defuseBomb(LiquidCrystal lcd)
+    {
+        clearLine(lcd, 1);
+        lcd.print("Bomb defused!   ");
+        reset();
+    }
+
+    void explodeBomb(LiquidCrystal lcd)
+    {
+        clearLine(lcd, 1);
+        lcd.print("Bomb exploded!   ");
+        reset();
     }
 
     void clearLine(LiquidCrystal lcd, int line)

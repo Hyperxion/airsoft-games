@@ -7,7 +7,8 @@ enum GAME_STATES
     IN_MENU,
     IN_BOMB_MODE,
     BOMB_PLANTED,
-    BOMB_EXPLODED,
+    BOMB_EXPLODED,    
+    BOMB_DEFUSED,
     IN_DOMINATOR_MODE,
     DOMINATOR_RED,
     DOMINATOR_BLUE
@@ -69,7 +70,7 @@ public:
     {
         bomb.displayTimer(lcd);
         lcd.setCursor(0, 1);
-        lcd.print(">Plant Bomb");
+        lcd.print(">Plant Bomb     ");
     }
 
     void displayDominatorMode(LiquidCrystal lcd)

@@ -9,7 +9,7 @@
 #define key3 5 // connect wire 3 to pin 4
 #define key4 6 // connect wire 4 to pin 5
 
-#define debounce 20   // ms debounce period to prevent flickering when pressing or releasing the button
+#define debounce 20        // ms debounce period to prevent flickering when pressing or releasing the button
 #define holdTimeShort 1000 // ms hold period: how long to wait for press+hold event
 #define holdTimeLong 3000
 
@@ -168,7 +168,6 @@ void loop()
           game.displayDominatorMode(lcd);
         }
       }
-
       else if (game.currentState == IN_BOMB_MODE)
       {
         // What to do if button 2 is pressed in bomb mode
@@ -177,6 +176,12 @@ void loop()
       else if (game.currentState == IN_DOMINATOR_MODE)
       {
         // What to do if button 2 is pressed in dominator mode
+      }
+
+      else if (game.currentState == BOMB_DEFUSED || game.currentState == BOMB_EXPLODED)
+      {
+        game.currentState = IN_BOMB_MODE;
+        game.displayBombMode(lcd);
       }
 
       delay(200);
@@ -189,9 +194,16 @@ void loop()
     }
   }
 
+  if (btn2 == LOW && (millis() - btn2DnTime) > long(holdTimeLong - 4500))
+  {
+    /* Play BEEP sound*/
+    game.clearLine(lcd, 1);
+    
+  }
+
   // Test for button held down for longer than the hold time
   // Basically if button is held more than hold time
-  if (btn2 == LOW && (millis() - btn2DnTime) > long(holdTimeShort))
+  if (btn2 == LOW && (millis() - btn2DnTime) > long(holdTimeLong))
   {
     if (game.currentState == IN_MENU)
     {
@@ -200,10 +212,14 @@ void loop()
 
     else if (game.currentState == IN_BOMB_MODE)
     {
-
       game.currentState = BOMB_PLANTED;
       game.bomb.plantBomb(lcd);
-      game.bomb.startTimer(lcd);
+      // game.bomb.startTimer(lcd);
+    }
+    else if (game.currentState == BOMB_PLANTED)
+    {
+      game.bomb.defuseBomb(lcd);
+      game.currentState = BOMB_DEFUSED;
     }
 
     else if (game.currentState == IN_DOMINATOR_MODE)
@@ -301,6 +317,18 @@ void loop()
     }
 
     delay(200);
+  }
+
+  if (game.currentState == BOMB_PLANTED)
+  {
+    delay(1000);
+    game.bomb.decreaseCurrentTimerBySecond();
+    game.bomb.refreshTimer(lcd);
+    if (game.bomb.currentTimerMinutes == 0 && game.bomb.currentTimerSeconds == 0)
+    {
+      game.currentState = BOMB_EXPLODED;
+      game.bomb.explodeBomb(lcd);
+    }
   }
 
   // Dominator time measuring
