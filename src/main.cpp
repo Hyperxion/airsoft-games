@@ -300,7 +300,7 @@ void loop()
     btn3DnTime = millis();
   }
 
-// Test for button pressed and store the down time
+  // Test for button pressed and store the down time
   if (btn4 == LOW && btn4Last == HIGH && (millis() - btn4UpTime) > long(debounce))
   {
     btn4DnTime = millis();
@@ -312,45 +312,45 @@ void loop()
   {
     // button is pressed
     if (btn4IgnoreUp == false)
-  {
-    if (game.currentState == IN_MENU)
     {
-      /* This button  does nothing when in menu*/
+      if (game.currentState == IN_MENU)
+      {
+        /* This button  does nothing when in menu*/
+      }
+
+      else if (game.currentState == IN_BOMB_MODE)
+      {
+        if (game.currentState == BOMB_PLANTED)
+        {
+          /* This button  does nothing when bomb is planted*/
+        }
+
+        if (game.currentState == BOMB_EXPLODED)
+        {
+          /* This button  does nothing when bomb is planted*/
+        }
+        else
+        {
+          game.bomb.increaseTimerByStep();
+          game.displayBombMode(lcd);
+        }
+      }
+
+      else if (game.currentState == IN_DOMINATOR_MODE)
+      {
+        if (game.currentState == DOMINATOR_RED)
+        {
+          /* code */
+        }
+
+        if (game.currentState == DOMINATOR_BLUE)
+        {
+          /* code */
+        }
+      }
+
+      delay(200);
     }
-
-    else if (game.currentState == IN_BOMB_MODE)
-    {
-      if (game.currentState == BOMB_PLANTED)
-      {
-        /* This button  does nothing when bomb is planted*/
-      }
-
-      if (game.currentState == BOMB_EXPLODED)
-      {
-        /* This button  does nothing when bomb is planted*/
-      }
-      else
-      {
-        game.bomb.increaseTimerByStep();
-        game.displayBombMode(lcd);
-      }
-    }
-
-    else if (game.currentState == IN_DOMINATOR_MODE)
-    {
-      if (game.currentState == DOMINATOR_RED)
-      {
-        /* code */
-      }
-
-      if (game.currentState == DOMINATOR_BLUE)
-      {
-        /* code */
-      }
-    }
-
-    delay(200);
-  }
     // button is held
     else
     {
@@ -375,7 +375,6 @@ void loop()
     btn4DnTime = millis();
   }
 
-
   if (game.currentState == BOMB_PLANTED)
   {
     delay(1000);
@@ -391,14 +390,30 @@ void loop()
   // Dominator time measuring
   if (game.currentState == DOMINATOR_RED)
   {
-    delay(1000);
-    game.dominator.resumeRedTimer();
+    if (game.dominator.redTimerHours == 10)
+    {
+      game.dominator.reset();
+      game.currentState = IN_DOMINATOR_MODE;      
+    }
+    else
+    {
+      delay(1000);
+      game.dominator.resumeRedTimer();      
+    }
     game.displayDominatorMode(lcd);
   }
   else if (game.currentState == DOMINATOR_BLUE)
   {
-    delay(1000);
-    game.dominator.resumeBlueTimer();
+    if (game.dominator.blueTimerHours == 10)
+    {
+      game.dominator.reset();
+      game.currentState = IN_DOMINATOR_MODE;      
+    }
+    else
+    {
+      delay(1000);
+      game.dominator.resumeBlueTimer();      
+    }
     game.displayDominatorMode(lcd);
   }
 

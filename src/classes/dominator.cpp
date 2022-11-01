@@ -37,8 +37,10 @@ public:
     {
         redTimerSeconds = 0;
         redTimerMinutes = 0;
+        redTimerHours = 0;
         blueTimerSeconds = 0;
         blueTimerMinutes = 0;
+        blueTimerHours = 0;
     }
 
     void displayTimer(LiquidCrystal lcd)
@@ -60,16 +62,13 @@ public:
         {
             redTimerSeconds = 0;
             redTimerMinutes++;
-        }
-        else if (redTimerMinutes == 59)
-        {
-            redTimerMinutes = 0;
+            if (redTimerMinutes == 60)
+            {
+                redTimerMinutes = 0;
+                redTimerHours++;                
             redTimerHours++;
-        }
-        else if (redTimerHours == 9)
-        {
-            redTimerHours = 0;
-            reset();
+                redTimerHours++;                
+            }
         }
         else
         {
