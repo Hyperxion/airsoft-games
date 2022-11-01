@@ -45,7 +45,7 @@ public:
     {
         char buffer[17];
         clearLine(lcd, 0);
-        sprintf(buffer, "%1d:%02d:%02d  %1d:%02d:%02d", redTimerHours, redTimerMinutes, redTimerSeconds, blueTimerHours,blueTimerMinutes, blueTimerSeconds);
+        sprintf(buffer, "%1d:%02d:%02d  %1d:%02d:%02d", redTimerHours, redTimerMinutes, redTimerSeconds, blueTimerHours, blueTimerMinutes, blueTimerSeconds);
         lcd.print(buffer);
     }
 
@@ -77,7 +77,7 @@ public:
         }
     }
 
-        void resumeBlueTimer()
+    void resumeBlueTimer()
     {
         if (blueTimerSeconds == 59)
         {

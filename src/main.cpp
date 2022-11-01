@@ -11,7 +11,7 @@
 
 #define debounce 20        // ms debounce period to prevent flickering when pressing or releasing the button
 #define holdTimeShort 1000 // ms hold period: how long to wait for press+hold event
-#define holdTimeLong 3000
+#define holdTimeLong 2500
 
 // Button variables for press and hold function
 int btn1Last = HIGH;          // buffered value of the button's previous state
@@ -128,11 +128,6 @@ void loop()
     btn1DnTime = millis();
   }
 
-  // Source for press and hold: http://jmsarduino.blogspot.com/2009/05/click-for-press-and-hold-for-b.html
-
-  /*
-   Defines what button two does in different game states when pressed
-  */
   // Test for button pressed and store the down time
   if (btn2 == LOW && btn2Last == HIGH && (millis() - btn2UpTime) > long(debounce))
   {
@@ -194,11 +189,9 @@ void loop()
     }
   }
 
-  if (btn2 == LOW && (millis() - btn2DnTime) > long(holdTimeLong - 4500))
+  if (btn2 == LOW && (millis() - btn2DnTime) > long(holdTimeLong - 2000))
   {
     /* Play BEEP sound*/
-    game.clearLine(lcd, 1);
-    
   }
 
   // Test for button held down for longer than the hold time
@@ -222,63 +215,103 @@ void loop()
       game.currentState = BOMB_DEFUSED;
     }
 
-    else if (game.currentState == IN_DOMINATOR_MODE)
+    else if (game.currentState == DOMINATOR_BLUE || game.currentState == DOMINATOR_RED)
     {
-      // What to do if button 2 is held in dominator mode
+      game.currentState = IN_DOMINATOR_MODE;
+      game.displayDominatorMode(lcd);
     }
 
     btn2IgnoreUp = true;
     btn2DnTime = millis();
   }
 
-  /*
-   Defines what button three does in different game states when pressed
-  */
-  if (!btn3)
+  // Test for button pressed and store the down time
+  if (btn3 == LOW && btn3Last == HIGH && (millis() - btn3UpTime) > long(debounce))
   {
-    if (game.currentState == IN_MENU)
+    btn3DnTime = millis();
+  }
+
+  // Test for button release and store the up time
+  // Basically if button is pressed
+  if (btn3 == HIGH && btn3Last == LOW && (millis() - btn3DnTime) > long(debounce))
+  {
+    // button is pressed
+    if (btn3IgnoreUp == false)
     {
-      /* This button  does nothing when in menu*/
+      if (game.currentState == IN_MENU)
+      {
+        /* This button  does nothing when in menu*/
+      }
+
+      else if (game.currentState == IN_BOMB_MODE)
+      {
+        if (game.currentState == BOMB_PLANTED)
+        {
+          /* This button  does nothing when bomb is planted*/
+        }
+
+        if (game.currentState == BOMB_EXPLODED)
+        {
+          /* This button  does nothing when bomb is planted*/
+        }
+        else
+        {
+          game.bomb.decreaseTimerByStep();
+          game.displayBombMode(lcd);
+        }
+      }
+
+      else if (game.currentState == IN_DOMINATOR_MODE)
+      {
+        if (game.currentState == DOMINATOR_RED)
+        {
+          /* code */
+        }
+
+        if (game.currentState == DOMINATOR_BLUE)
+        {
+          /* code */
+        }
+      }
+
+      delay(200);
     }
-
-    else if (game.currentState == IN_BOMB_MODE)
+    // button is held
+    else
     {
-      if (game.currentState == BOMB_PLANTED)
-      {
-        /* This button  does nothing when bomb is planted*/
-      }
-
-      if (game.currentState == BOMB_EXPLODED)
-      {
-        /* This button  does nothing when bomb is planted*/
-      }
-      else
-      {
-        game.bomb.decreaseTimerByStep();
-        game.displayBombMode(lcd);
-      }
+      btn3IgnoreUp = false;
+      btn3UpTime = millis();
     }
+  }
 
-    else if (game.currentState == IN_DOMINATOR_MODE)
+  // Test for button held down for longer than the hold time
+  // Basically if button is held more than hold time
+  if (btn3 == LOW && (millis() - btn3DnTime) > long(holdTimeLong))
+  {
+    if (game.currentState == IN_DOMINATOR_MODE)
     {
-      if (game.currentState == DOMINATOR_RED)
-      {
-        /* code */
-      }
-
-      if (game.currentState == DOMINATOR_BLUE)
-      {
-        /* code */
-      }
+      game.currentState = DOMINATOR_RED;
+      game.displayDominatorMode(lcd);
     }
 
     delay(200);
+
+    btn3IgnoreUp = true;
+    btn3DnTime = millis();
   }
 
-  /*
-   Defines what button four does in different game states when pressed
-  */
-  if (!btn4)
+// Test for button pressed and store the down time
+  if (btn4 == LOW && btn4Last == HIGH && (millis() - btn4UpTime) > long(debounce))
+  {
+    btn4DnTime = millis();
+  }
+
+  // Test for button release and store the up time
+  // Basically if button is pressed
+  if (btn4 == HIGH && btn4Last == LOW && (millis() - btn4DnTime) > long(debounce))
+  {
+    // button is pressed
+    if (btn4IgnoreUp == false)
   {
     if (game.currentState == IN_MENU)
     {
@@ -318,6 +351,30 @@ void loop()
 
     delay(200);
   }
+    // button is held
+    else
+    {
+      btn4IgnoreUp = false;
+      btn4UpTime = millis();
+    }
+  }
+
+  // Test for button held down for longer than the hold time
+  // Basically if button is held more than hold time
+  if (btn4 == LOW && (millis() - btn4DnTime) > long(holdTimeLong))
+  {
+    if (game.currentState == IN_DOMINATOR_MODE)
+    {
+      game.currentState = DOMINATOR_BLUE;
+      game.displayDominatorMode(lcd);
+    }
+
+    delay(200);
+
+    btn4IgnoreUp = true;
+    btn4DnTime = millis();
+  }
+
 
   if (game.currentState == BOMB_PLANTED)
   {
@@ -336,13 +393,17 @@ void loop()
   {
     delay(1000);
     game.dominator.resumeRedTimer();
+    game.displayDominatorMode(lcd);
   }
-  else if (game.currentState == DOMINATOR_RED)
+  else if (game.currentState == DOMINATOR_BLUE)
   {
     delay(1000);
-    game.dominator.resumeRedTimer();
+    game.dominator.resumeBlueTimer();
+    game.displayDominatorMode(lcd);
   }
 
   btn1Last = btn1;
   btn2Last = btn2;
+  btn3Last = btn3;
+  btn4Last = btn4;
 }

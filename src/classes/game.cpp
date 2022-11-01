@@ -76,7 +76,7 @@ public:
     void displayDominatorMode(LiquidCrystal lcd)
     {
         dominator.displayTimer(lcd);
-        //clearLine(lcd, 1);
+        clearLine(lcd, 1);
         lcd.setCursor(0, 1);
         if (currentState == IN_DOMINATOR_MODE)
         {
