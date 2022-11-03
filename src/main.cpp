@@ -4,14 +4,14 @@
 #include <string.h>
 #include "classes/game.cpp"
 
-#define key1 3 // connect wire 1 to pin 2
-#define key2 4 // connect wire 2 to pin 3
+#define key1 7 // connect wire 1 to pin 2
+#define key2 6 // connect wire 2 to pin 3
 #define key3 5 // connect wire 3 to pin 4
-#define key4 6 // connect wire 4 to pin 5
+#define key4 4 // connect wire 4 to pin 5
 
 #define debounce 20        // ms debounce period to prevent flickering when pressing or releasing the button
 #define holdTimeShort 1000 // ms hold period: how long to wait for press+hold event
-#define holdTimeLong 2500
+#define holdTimeLong 5000
 
 // Button variables for press and hold function
 int btn1Last = HIGH;          // buffered value of the button's previous state
@@ -34,7 +34,7 @@ long btn4DnTime;              // time the button was pressed down
 long btn4UpTime;              // time the button was released
 boolean btn4IgnoreUp = false; // whether to ignore the button release because the click+hold was triggered
 
-LiquidCrystal lcd(12, 13, 8, 9, 10, 11); /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8); /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
 
 Bomb bomb;
 Game game;
