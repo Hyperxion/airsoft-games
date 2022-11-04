@@ -3,6 +3,8 @@
 #include <Wire.h>
 #include <string.h>
 #include "classes/game.cpp"
+#include "SoftwareSerial.h"
+#include "DFRobotDFPlayerMini.h"
 
 #define key1 7 // connect wire 1 to pin 2
 #define key2 6 // connect wire 2 to pin 3
@@ -35,6 +37,8 @@ long btn4UpTime;              // time the button was released
 boolean btn4IgnoreUp = false; // whether to ignore the button release because the click+hold was triggered
 
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8); /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
+SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
+DFRobotDFPlayerMini myDFPlayer;
 
 Bomb bomb;
 Game game;
@@ -43,8 +47,14 @@ int timeBombPlanted;
 int timeBombStaredDefusing;
 int lap = 0;
 
+void playSound(int index);
+
 void setup()
 {
+  mySoftwareSerial.begin(9600);
+  myDFPlayer.begin(mySoftwareSerial);
+  myDFPlayer.volume(15);
+
   game = Game();
 
   analogWrite(6, 75);
@@ -55,7 +65,8 @@ void setup()
   pinMode(key3, INPUT_PULLUP); // set pin as input
   pinMode(key4, INPUT_PULLUP); // set pin as input
 
-  game.displayGameMenu(lcd);
+  game.displayGameMenu(lcd);  
+  myDFPlayer.play(1);
 }
 
 void loop()
@@ -393,12 +404,12 @@ void loop()
     if (game.dominator.redTimerHours == 10)
     {
       game.dominator.reset();
-      game.currentState = IN_DOMINATOR_MODE;      
+      game.currentState = IN_DOMINATOR_MODE;
     }
     else
     {
       delay(1000);
-      game.dominator.resumeRedTimer();      
+      game.dominator.resumeRedTimer();
     }
     game.displayDominatorMode(lcd);
   }
@@ -407,12 +418,12 @@ void loop()
     if (game.dominator.blueTimerHours == 10)
     {
       game.dominator.reset();
-      game.currentState = IN_DOMINATOR_MODE;      
+      game.currentState = IN_DOMINATOR_MODE;
     }
     else
     {
       delay(1000);
-      game.dominator.resumeBlueTimer();      
+      game.dominator.resumeBlueTimer();
     }
     game.displayDominatorMode(lcd);
   }
@@ -421,4 +432,10 @@ void loop()
   btn2Last = btn2;
   btn3Last = btn3;
   btn4Last = btn4;
+}
+
+void playSound(int index)
+{
+  myDFPlayer.volume(10);  // Set volume value. From 0 to 30
+  myDFPlayer.play(index); // Play the first mp3
 }
