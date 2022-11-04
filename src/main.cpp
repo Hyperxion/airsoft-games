@@ -262,6 +262,7 @@ void loop()
     {
       game.currentState = IN_DOMINATOR_MODE;
       game.displayDominatorMode(lcd);
+      myDFPlayer.play(dominatorNeutralized);
     }
 
     btn2IgnoreUp = true;
@@ -335,9 +336,8 @@ void loop()
     {
       game.currentState = DOMINATOR_RED;
       game.displayDominatorMode(lcd);
-    }
-
-    delay(200);
+      myDFPlayer.play(redTeamDominating);
+    }    
 
     btn3IgnoreUp = true;
     btn3DnTime = millis();
@@ -410,6 +410,7 @@ void loop()
     {
       game.currentState = DOMINATOR_BLUE;
       game.displayDominatorMode(lcd);
+      myDFPlayer.play(blueTeamDominating);
     }
 
     delay(200);
@@ -499,7 +500,7 @@ void loop()
       game.currentState = IN_DOMINATOR_MODE;
     }
     else
-    {
+    {      
       delay(1000);
       game.dominator.resumeBlueTimer();
     }
