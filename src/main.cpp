@@ -15,6 +15,20 @@
 #define holdTimeShort 1000 // ms hold period: how long to wait for press+hold event
 #define holdTimeLong 5000
 
+/* Sound effect numbers */
+const int turnOn = 1;
+const int c4StartPlanting = 2;
+const int c3Planted = 3;
+const int c4Beep = 4;
+const int c4Explosion = 5;
+const int c4StartDefuse = 6;
+const int c4Defused = 7;
+const int ctWin = 8;
+const int tWint = 9;
+const int blueTeamDominating = 10;
+const int dominatorNeutralized = 11;
+const int redTeamDominating = 12;
+
 // Button variables for press and hold function
 int btn1Last = HIGH;          // buffered value of the button's previous state
 long btn1DnTime;              // time the button was pressed down
