@@ -18,7 +18,7 @@
 /* Sound effect numbers */
 const int turnOn = 1;
 const int c4StartPlanting = 2;
-const int c3Planted = 3;
+const int c4Planted = 3;
 const int c4Beep = 4;
 const int c4Explosion = 5;
 const int c4StartDefuse = 6;
@@ -51,15 +51,15 @@ long btn4UpTime;              // time the button was released
 boolean btn4IgnoreUp = false; // whether to ignore the button release because the click+hold was triggered
 
 LiquidCrystal lcd(13, 12, 11, 10, 9, 8); /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
-SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
+SoftwareSerial mySoftwareSerial(2, 3);   // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 
 Bomb bomb;
 Game game;
 
-int timeBombPlanted;
-int timeBombStaredDefusing;
-int lap = 0;
+// int timeBombPlanted;
+// int timeBombStartedDefusing;
+// int lap = 0;
 
 void playSound(int index);
 
@@ -79,8 +79,8 @@ void setup()
   pinMode(key3, INPUT_PULLUP); // set pin as input
   pinMode(key4, INPUT_PULLUP); // set pin as input
 
-  game.displayGameMenu(lcd);  
-  myDFPlayer.play(1);
+  game.displayGameMenu(lcd);
+  myDFPlayer.play(turnOn);
 }
 
 void loop()
@@ -160,10 +160,10 @@ void loop()
 
     // if we are in bomb mode, this will mark time of planting sequence start
     // later we will compare this time with actual time of program and udpate progress bar
-    if (game.currentState == IN_BOMB_MODE)
-    {
-      timeBombPlanted = millis();
-    }
+    // if (game.currentState == IN_BOMB_MODE)
+    // {
+    //   timeBombPlanted = millis();
+    // }
   }
 
   // Test for button release and store the up time
@@ -214,9 +214,10 @@ void loop()
     }
   }
 
-  if (btn2 == LOW && (millis() - btn2DnTime) > long(holdTimeLong - 2000))
+  if (btn2 == LOW && (millis() - btn2DnTime) == 500)
   {
-    /* Play BEEP sound*/
+    myDFPlayer.play(c4StartPlanting);
+    delay(1000);
   }
 
   // Test for button held down for longer than the hold time
@@ -232,7 +233,10 @@ void loop()
     {
       game.currentState = BOMB_PLANTED;
       game.bomb.plantBomb(lcd);
-      // game.bomb.startTimer(lcd);
+      myDFPlayer.play(c4Planted);
+      delay(2000);
+      game.clearLine(lcd, 1);
+      lcd.print(">Defuse        ");
     }
     else if (game.currentState == BOMB_PLANTED)
     {

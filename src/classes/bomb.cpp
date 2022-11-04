@@ -4,7 +4,7 @@ class Bomb
 {
 private:
     // in seconds
-    int plantTime = 5;
+    int plantTime = 3;
     int defuseTime = 5;
     int timerStep = 5;
 
@@ -155,10 +155,7 @@ public:
         }
 
         clearLine(lcd, 1);
-        lcd.print("Bomb planted!   ");
-        delay(2000);
-        clearLine(lcd, 1);
-        lcd.print(">Defuse        ");
+        lcd.print("Bomb planted!   ");        
     }
 
     void defuseBomb(LiquidCrystal lcd)
