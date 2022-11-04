@@ -157,13 +157,6 @@ void loop()
   if (btn2 == LOW && btn2Last == HIGH && (millis() - btn2UpTime) > long(debounce))
   {
     btn2DnTime = millis();
-
-    // if we are in bomb mode, this will mark time of planting sequence start
-    // later we will compare this time with actual time of program and udpate progress bar
-    // if (game.currentState == IN_BOMB_MODE)
-    // {
-    //   timeBombPlanted = millis();
-    // }
   }
 
   // Test for button release and store the up time
