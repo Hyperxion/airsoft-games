@@ -22,9 +22,9 @@ const int c4Planted = 3;
 const int c4Beep = 4;
 const int c4Explosion = 5;
 const int c4StartDefuse = 6;
-const int c4Defused = 7;
-const int ctWin = 8;
-const int tWint = 9;
+const int ctWin = 7;
+const int c4Defused = 8;
+const int tWin = 9;
 const int blueTeamDominating = 10;
 const int dominatorNeutralized = 11;
 const int redTeamDominating = 12;
@@ -216,8 +216,19 @@ void loop()
 
   if (btn2 == LOW && (millis() - btn2DnTime) == 500)
   {
-    myDFPlayer.play(c4StartPlanting);
-    delay(1000);
+    if (game.currentState == IN_BOMB_MODE)
+    {
+      myDFPlayer.play(c4StartPlanting);
+      delay(1000);
+    }
+    // for some reason this code never executes. game.currenState is BOMB_PLANTED - proof is beeping sounds. 
+    // But this code will not execute anyway
+    else if (game.currentState == BOMB_PLANTED)
+    {
+      game.clearLine(lcd, 1);
+      myDFPlayer.play(c4StartDefuse);
+      delay(1000);
+    }    
   }
 
   // Test for button held down for longer than the hold time
@@ -231,16 +242,19 @@ void loop()
 
     else if (game.currentState == IN_BOMB_MODE)
     {
-      game.currentState = BOMB_PLANTED;
       game.bomb.plantBomb(lcd);
       myDFPlayer.play(c4Planted);
       delay(2000);
       game.clearLine(lcd, 1);
       lcd.print(">Defuse        ");
+      game.currentState = BOMB_PLANTED;
     }
     else if (game.currentState == BOMB_PLANTED)
     {
       game.bomb.defuseBomb(lcd);
+      myDFPlayer.play(c4Defused);
+      delay(2000);
+      myDFPlayer.play(ctWin);
       game.currentState = BOMB_DEFUSED;
     }
 
@@ -406,13 +420,59 @@ void loop()
 
   if (game.currentState == BOMB_PLANTED)
   {
-    delay(1000);
     game.bomb.decreaseCurrentTimerBySecond();
     game.bomb.refreshTimer(lcd);
+
+    const double timerProgress = double(game.bomb.currentTimerMinutes * 60 + game.bomb.currentTimerSeconds) / double(game.bomb.timerMinutes * 60 + game.bomb.timerSeconds);
+
+    if (timerProgress < 0.05)
+    {
+      for (int i = 0; i < 6; i++)
+      {
+        myDFPlayer.play(c4Beep);
+        delay(166);
+      }
+    }
+
+    else if (timerProgress < 0.25)
+    {
+      for (int i = 0; i < 4; i++)
+      {
+        myDFPlayer.play(c4Beep);
+        delay(250);
+      }
+    }
+
+    else if (timerProgress < 0.5)
+    {
+      for (int i = 0; i < 3; i++)
+      {
+        myDFPlayer.play(c4Beep);
+        delay(333);
+      }
+    }
+
+    else if (timerProgress < 0.75)
+    {
+      for (int i = 0; i < 2; i++)
+      {
+        myDFPlayer.play(c4Beep);
+        delay(500);
+      }
+    }
+    else
+    {
+      myDFPlayer.play(c4Beep);
+      delay(1000);
+    }
+
     if (game.bomb.currentTimerMinutes == 0 && game.bomb.currentTimerSeconds == 0)
     {
-      game.currentState = BOMB_EXPLODED;
       game.bomb.explodeBomb(lcd);
+      myDFPlayer.play(c4Explosion);
+      delay(2000);
+      myDFPlayer.play(tWin);
+      game.currentState = BOMB_EXPLODED;
     }
   }
 
