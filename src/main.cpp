@@ -217,8 +217,7 @@ void loop()
     // for some reason this code never executes. game.currenState is BOMB_PLANTED - proof is beeping sounds. 
     // But this code will not execute anyway
     else if (game.currentState == BOMB_PLANTED)
-    {
-      game.clearLine(lcd, 1);
+    {      
       myDFPlayer.play(c4StartDefuse);
       delay(1000);
     }    
