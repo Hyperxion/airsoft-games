@@ -57,10 +57,6 @@ DFRobotDFPlayerMini myDFPlayer;
 Bomb bomb;
 Game game;
 
-// int timeBombPlanted;
-// int timeBombStartedDefusing;
-// int lap = 0;
-
 void playSound(int index);
 
 void setup()
