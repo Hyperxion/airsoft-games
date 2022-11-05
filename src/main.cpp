@@ -67,7 +67,7 @@ void setup()
 {
   mySoftwareSerial.begin(9600);
   myDFPlayer.begin(mySoftwareSerial);
-  myDFPlayer.volume(15);
+  myDFPlayer.volume(30);
 
   game = Game();
 
@@ -462,7 +462,9 @@ void loop()
     if (game.bomb.currentTimerMinutes == 0 && game.bomb.currentTimerSeconds == 0)
     {
       game.bomb.explodeBomb(lcd);
+      myDFPlayer.volume(20);
       myDFPlayer.play(c4Explosion);
+      myDFPlayer.volume(30);
       delay(2000);
       myDFPlayer.play(tWin);
       game.currentState = BOMB_EXPLODED;
