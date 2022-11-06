@@ -6,10 +6,10 @@
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
 
-#define key1 7 // connect wire 1 to pin 2
-#define key2 6 // connect wire 2 to pin 3
-#define key3 5 // connect wire 3 to pin 4
-#define key4 4 // connect wire 4 to pin 5
+#define key1 A0
+#define key2 A1
+#define key3 A2
+#define key4 A3
 
 #define debounce 20        // ms debounce period to prevent flickering when pressing or releasing the button
 #define holdTimeShort 1000 // ms hold period: how long to wait for press+hold event
@@ -28,6 +28,11 @@ const int tWin = 9;
 const int blueTeamDominating = 10;
 const int dominatorNeutralized = 11;
 const int redTeamDominating = 12;
+
+int btn1 = HIGH;
+int btn2 = HIGH;
+int btn3 = HIGH;
+int btn4 = HIGH;
 
 // Button variables for press and hold function
 int btn1Last = HIGH;          // buffered value of the button's previous state
@@ -50,8 +55,8 @@ long btn4DnTime;              // time the button was pressed down
 long btn4UpTime;              // time the button was released
 boolean btn4IgnoreUp = false; // whether to ignore the button release because the click+hold was triggered
 
-LiquidCrystal lcd(13, 12, 11, 10, 9, 8); /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
-SoftwareSerial mySoftwareSerial(2, 3);   // RX, TX
+LiquidCrystal lcd(4, 5, 6, 7, 8, 9);   /// REGISTER SELECT PIN,ENABLE PIN,D4 PIN,D5 PIN, D6 PIN, D7 PIN
+SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 
 Bomb bomb;
@@ -81,10 +86,52 @@ void setup()
 
 void loop()
 {
-  int btn1 = digitalRead(key1);
-  int btn2 = digitalRead(key2);
-  int btn3 = digitalRead(key3);
-  int btn4 = digitalRead(key4);
+  int btn1Val = analogRead(key1);
+  int btn2Val = analogRead(key2);
+  int btn3Val = analogRead(key3);
+  int btn4Val = analogRead(key4);
+
+  if (btn1Val > 30 && btn1Val < 50)
+  {
+    btn1 = LOW;
+  }
+  else
+  {
+    btn1 = HIGH;
+  }
+
+  if (btn2Val > 30 && btn2Val < 50)
+  {
+    btn2 = LOW;
+  }
+  else
+  {
+    btn2 = HIGH;
+  }
+
+  if (btn3Val > 30 && btn3Val < 50)
+  {
+    btn3 = LOW;
+  }
+  else
+  {
+    btn3 = HIGH;
+  }
+
+  if (btn4Val > 30 && btn4Val < 50)
+  {
+    btn4 = LOW;
+  }
+  else
+  {
+    btn4 = HIGH;
+  }
+
+  // if (btn1 == 40)
+  // {
+  //   myDFPlayer.play(1);
+  //   delay(100);
+  // }
 
   // Test for button pressed and store the down time
   if (btn1 == LOW && btn1Last == HIGH && (millis() - btn1UpTime) > long(debounce))
@@ -210,13 +257,13 @@ void loop()
       myDFPlayer.play(c4StartPlanting);
       delay(1000);
     }
-    // for some reason this code never executes. game.currenState is BOMB_PLANTED - proof is beeping sounds. 
+    // for some reason this code never executes. game.currenState is BOMB_PLANTED - proof is beeping sounds.
     // But this code will not execute anyway
     else if (game.currentState == BOMB_PLANTED)
-    {      
+    {
       myDFPlayer.play(c4StartDefuse);
       delay(1000);
-    }    
+    }
   }
 
   // Test for button held down for longer than the hold time
@@ -325,7 +372,7 @@ void loop()
       game.currentState = DOMINATOR_RED;
       game.displayDominatorMode(lcd);
       myDFPlayer.play(redTeamDominating);
-    }    
+    }
 
     btn3IgnoreUp = true;
     btn3DnTime = millis();
@@ -490,7 +537,7 @@ void loop()
       game.currentState = IN_DOMINATOR_MODE;
     }
     else
-    {      
+    {
       delay(1000);
       game.dominator.resumeBlueTimer();
     }
